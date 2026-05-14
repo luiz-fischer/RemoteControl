@@ -1,0 +1,30 @@
+# Android Studio and IntelliJ
+.idea/
+*.iml
+*.iws
+.gradle/
+build/
+captures/
+local.properties
+
+# Android Gradle Plugin
+.cxx/
+.externalNativeBuild/
+
+# Device-specific files
+*.apk
+*.ap_
+*.dex
+
+# Log files
+*.log
+
+# macOS
+.DS_Store
+
+# OS generated files
+Thumbs.db
+
+# Secrets
+secrets.xml
+google-services.json
