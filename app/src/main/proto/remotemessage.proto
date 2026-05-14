@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package com.example.remotecontrol.proto;
+
+option java_package = "com.example.remotecontrol.proto";
+option java_multiple_files = true;
+
+// ============================================================
+// PAREAMENTO (Porta 6467) - Protocolo Polo Oficial
+// ============================================================
+
+message OuterMessage {
+    enum Status {
+        STATUS_UNKNOWN = 0;
+        STATUS_OK = 200;
+        STATUS_ERROR = 400;
+        STATUS_BAD_CONFIGURATION = 401;
+        STATUS_BAD_SECRET = 402;
+    }
+
+    uint32 protocol_version = 1;
+    Status status = 2;
+
+    // Campos opcionais (um por mensagem)
+    PairingRequest pairing_request = 10;
+    PairingRequestAck pairing_request_ack = 11;
+    PairingOptions options = 20;
+    PairingConfiguration configuration = 30;
+    PairingConfigurationAck configuration_ack = 31;
+    PairingSecret secret = 40;
+    PairingSecretAck secret_ack = 41;
+}
+
+message PairingRequest {
+    string service_name = 1;
+    string client_name = 2;
+}
+
+message PairingRequestAck {
+    string server_name = 1;
+}
+
+message PairingOptions {
+    enum RoleType {
+        ROLE_TYPE_UNKNOWN = 0;
+        ROLE_TYPE_INPUT = 1;
+        ROLE_TYPE_OUTPUT = 2;
+    }
+    message Encoding {
+        enum EncodingType {
+            ENCODING_TYPE_UNKNOWN = 0;
+            ENCODING_TYPE_ALPHANUMERIC = 1;
+            ENCODING_TYPE_NUMERIC = 2;
+            ENCODING_TYPE_HEXADECIMAL = 3;
+            ENCODING_TYPE_QRCODE = 4;
+        }
+        EncodingType type = 1;
+        uint32 symbol_length = 2;
+    }
+    repeated Encoding input_encodings = 1;
+    repeated Encoding output_encodings = 2;
+    RoleType preferred_role = 3;
+}
+
+message PairingConfiguration {
+    PairingOptions.Encoding encoding = 1;
+    PairingOptions.RoleType client_role = 2;
+}
+
+message PairingConfigurationAck {}
+
+message PairingSecret {
+    bytes secret = 1;
+}
+
+message PairingSecretAck {
+    bytes secret = 1;
+}
+
+// ============================================================
+// CONTROLE REMOTO (Porta 6466)
+// ============================================================
+
+message RemoteMessage {
+    RemoteConfigure remote_configure = 1;
+    RemoteSetActive remote_set_active = 2;
+    RemoteError remote_error = 3;
+    RemotePingRequest remote_ping_request = 8;
+    RemotePingResponse remote_ping_response = 9;
+    RemoteKeyInject remote_key_inject = 10;
+    RemoteStart remote_start = 40;
+    RemoteSetVolumeLevel remote_set_volume_level = 50;
+    RemoteAppLinkLaunchRequest remote_app_link_launch_request = 90;
+}
+
+message RemoteStart {
+    bool started = 1;
+}
+
+message RemoteSetVolumeLevel {
+    string player_model = 3;
+    uint32 volume_max = 6;
+    uint32 volume_level = 7;
+    bool volume_muted = 8;
+}
+
+message RemoteConfigure {
+    int32 code1 = 1;
+    RemoteDeviceInfo device_info = 2;
+}
+
+message RemoteDeviceInfo {
+    string model = 1;
+    string vendor = 2;
+    int32 unknown1 = 3;
+    string package_name = 4;
+    string app_version = 5;
+}
+
+message RemoteSetActive {
+    int32 active = 1;
+}
+
+message RemotePingRequest {
+    int32 val1 = 1;
+}
+
+message RemotePingResponse {
+    int32 val1 = 1;
+}
+
+message RemoteKeyInject {
+    int32 key_code = 1;
+    RemoteDirection direction = 2;
+}
+
+message RemoteAppLinkLaunchRequest {
+    string app_link = 1;
+}
+
+message RemoteError {
+    bool value = 1;
+}
+
+enum RemoteDirection {
+    UNKNOWN_DIRECTION = 0;
+    START_LONG = 1;
+    END_LONG = 2;
+    SHORT_PRESS = 3;
+    START = 4;
+    END = 5;
+}
